@@ -7,6 +7,13 @@ export type { FileUploadProps } from "./FileUpload";
 export { Input } from "./Input";
 export type { InputProps } from "./Input";
 
+export { PasswordInput } from "./PasswordInput";
+export type { PasswordInputProps } from "./PasswordInput";
+
+export { FormButton } from "./FormButton";
+
+export { FormError } from "./FormError";
+
 export { RadioButton } from "./RadioButton";
 export type { RadioButtonProps } from "./RadioButton";
 

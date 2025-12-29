@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { signup, login, getProfile, logout } from '../controllers/authController';
+import { signup, login, getProfile, logout, refreshToken } from '../controllers/authController';
 import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validation';
 import { asyncHandler } from '../middleware/errorHandler';
@@ -37,7 +37,10 @@ router.post(
 );
 
 router.get('/profile', authenticate, asyncHandler(getProfile));
+router.get('/me', authenticate, asyncHandler(getProfile));
 
-router.post('/logout', authenticate, asyncHandler(logout));
+router.post('/refresh', asyncHandler(refreshToken));
+
+router.post('/logout', asyncHandler(logout));
 
 export default router;

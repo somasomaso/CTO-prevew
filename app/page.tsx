@@ -17,14 +17,19 @@ export default function Home() {
                 built for modern educational experiences.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <Link href="/dashboard">
+                <Link href="/login">
                   <Button size="lg">
+                    Get Started
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button variant="secondary" size="lg">
                     View Dashboard
                   </Button>
                 </Link>
                 <Link href="/design-system">
                   <Button variant="secondary" size="lg">
-                    Explore Design System
+                    Design System
                   </Button>
                 </Link>
               </div>
