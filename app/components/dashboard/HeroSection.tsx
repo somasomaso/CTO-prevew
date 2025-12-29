@@ -1,95 +1,113 @@
 "use client";
 
 import React from "react";
+import { Play, ArrowRight } from "@phosphor-icons/react";
 import { ProgressBar } from "../ui/ProgressBar";
-import { Button } from "../ui/Button";
 
-export function HeroSection() {
-  const currentCourse = {
-    title: "Advanced React Patterns",
-    subject: "Frontend Development",
-    progress: 67,
-    currentModule: "Custom Hooks Deep Dive",
-    nextModule: "Context API Mastery",
-    totalModules: 12,
-    completedModules: 8,
-    thumbnail: (
-      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neon-purple/30 to-neon-blue/30">
-        <svg className="h-16 w-16 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-        </svg>
-      </div>
-    ),
-  };
+export interface ContinueCourse {
+  title: string;
+  description: string;
+  category: string;
+  progress: number;
+  currentLesson?: string;
+  nextLesson?: string;
+}
+
+export interface HeroSectionProps {
+  course?: ContinueCourse;
+  onResume?: () => void;
+  onViewCourse?: () => void;
+}
+
+export function HeroSection({ course, onResume, onViewCourse }: HeroSectionProps) {
+  const currentCourse: ContinueCourse =
+    course ??
+    ({
+      title: "Advanced React Patterns",
+      description: "Build resilient UI systems with hooks, composition, and state machines.",
+      category: "Frontend Development",
+      progress: 67,
+      currentLesson: "Custom Hooks Deep Dive",
+      nextLesson: "Context API Mastery",
+    } satisfies ContinueCourse);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl glass-strong border border-white/10 p-6 md:p-8 animate-slide-up">
-      <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/10 via-neon-blue/10 to-neon-purple/10 opacity-50" />
-      <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-neon-purple/20 blur-[100px]" />
-      <div className="absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-neon-blue/20 blur-[100px]" />
-
-      <div className="relative z-10">
-        <div className="mb-6 flex items-start justify-between">
-          <div className="flex-1">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-neon-purple/20 to-neon-blue/20 px-4 py-1.5 border border-neon-purple/30">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon-purple opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-neon-purple"></span>
-              </span>
-              <span className="text-xs font-medium gradient-text uppercase tracking-wider">
-                Continue Learning
-              </span>
-            </div>
-            
-            <h2 className="mb-2 text-3xl font-bold text-foreground md:text-4xl">
-              {currentCourse.title}
-            </h2>
-            <p className="mb-4 text-muted-foreground">
-              {currentCourse.subject} • {currentCourse.currentModule}
-            </p>
-            
-            <div className="mb-4 max-w-lg">
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Module {currentCourse.completedModules} of {currentCourse.totalModules}
+    <section className="animate-slide-up">
+      <div className="group relative rounded-4xl bg-gradient-to-r from-neon-purple/60 via-neon-cyan/30 to-neon-blue/60 p-[1px] shadow-neon-glow transition-shadow duration-300 hover:shadow-neon-blue">
+        <div className="light-leak glass-strong relative overflow-hidden rounded-4xl p-6 md:p-8">
+          <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-xs font-semibold tracking-wider text-white/80">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon-purple opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-neon-purple" />
                 </span>
-                <span className="font-semibold gradient-text">
-                  {currentCourse.progress}%
-                </span>
+                <span className="gradient-text uppercase">Continue Learning</span>
               </div>
-              <ProgressBar value={currentCourse.progress} />
+
+              <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+                {currentCourse.title}
+              </h2>
+              <p className="mt-2 text-sm text-white/70 md:text-base">
+                {currentCourse.description}
+              </p>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-white/60">
+                <span className="glass rounded-full px-3 py-1">
+                  {currentCourse.category}
+                </span>
+                {currentCourse.currentLesson && (
+                  <span className="glass rounded-full px-3 py-1">
+                    Now: {currentCourse.currentLesson}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-6 max-w-xl">
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="text-white/60">Progress</span>
+                  <span className="font-semibold text-white">{currentCourse.progress}%</span>
+                </div>
+                <ProgressBar
+                  value={currentCourse.progress}
+                  className="gap-2"
+                  trackClassName="h-2.5 bg-white/10"
+                  barClassName="bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-blue shadow-neon-purple"
+                />
+              </div>
+
+              {currentCourse.nextLesson && (
+                <p className="mt-4 text-sm text-white/60">
+                  Up next: <span className="font-medium text-white">{currentCourse.nextLesson}</span>
+                </p>
+              )}
+            </div>
+
+            <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:flex-col">
+              <button
+                type="button"
+                onClick={onResume}
+                className="glass-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-neon-purple to-neon-blue px-5 py-3 text-sm font-semibold text-white shadow-neon-purple transition-all duration-300 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-neon-purple"
+              >
+                <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
+                  <Play weight="fill" className="h-5 w-5" />
+                </span>
+                <span>Resume</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onViewCourse}
+                className="glass-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-neon-blue"
+              >
+                View course
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
-          <div className="hidden md:block">
-            <div className="relative h-40 w-48 overflow-hidden rounded-2xl glass-light border border-white/20">
-              {currentCourse.thumbnail}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">
-            <span className="text-white font-medium">Up next:</span> {currentCourse.nextModule}
-          </p>
-          
-          <div className="flex gap-3">
-            <Button 
-              variant="ghost" 
-              className="border border-white/10 bg-white/5 text-white hover:bg-white/10"
-            >
-              View Course
-            </Button>
-            <Button 
-              className="bg-gradient-to-r from-neon-purple to-neon-blue text-white shadow-neon-purple hover:shadow-neon-purple hover:scale-105 transition-all duration-300"
-            >
-              <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Resume Learning
-            </Button>
-          </div>
+          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-neon-purple/25 blur-[120px] transition-opacity duration-500 group-hover:opacity-90" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-neon-blue/20 blur-[120px] transition-opacity duration-500 group-hover:opacity-90" />
         </div>
       </div>
     </section>

@@ -1,30 +1,40 @@
 "use client";
 
 import React from "react";
-import { Sidebar } from "../components/dashboard/Sidebar";
-import { Header } from "../components/dashboard/Header";
-import { HeroSection } from "../components/dashboard/HeroSection";
-import { LibraryGrid } from "../components/dashboard/LibraryGrid";
+import {
+  Sidebar,
+  Header,
+  HeroSection,
+  LibraryGrid,
+  Footer,
+  FloatingActionButton,
+} from "../components/dashboard";
 
 export default function UserDashboard() {
   return (
-    <div className="flex min-h-screen bg-background dark">
+    <div className="relative h-screen overflow-hidden bg-dark-900">
+      <div className="pointer-events-none absolute inset-0 bg-neon-glow opacity-35" />
+      <div className="ambient-orb ambient-orb-purple -top-24 left-1/3 h-[520px] w-[520px] animate-float" />
+      <div className="ambient-orb ambient-orb-blue bottom-[-180px] left-[-120px] h-[520px] w-[520px] animate-float" />
+      <div className="ambient-orb ambient-orb-cyan -right-36 top-1/2 h-[420px] w-[420px] animate-float" />
+
       <Sidebar />
 
-      <main className="flex-1 overflow-auto">
-        <div className="relative min-h-screen bg-gradient-to-br from-background via-[hsl(250_20%_8%)] to-[hsl(275_30%_10%)] p-4 md:p-6 lg:p-8">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-neon-purple/10 via-transparent to-transparent opacity-50" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-neon-blue/10 via-transparent to-transparent opacity-50" />
-          
-          <div className="relative z-10 space-y-6">
-            <Header />
-            
-            <HeroSection />
-            
-            <LibraryGrid />
+      <main className="relative z-10 h-screen overflow-y-auto pl-20 md:pl-64">
+        <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col gap-6 p-4 md:p-6 lg:p-8">
+          <Header userName="Alex" />
+
+          <HeroSection />
+
+          <LibraryGrid />
+
+          <div className="mt-auto pt-6">
+            <Footer />
           </div>
         </div>
       </main>
+
+      <FloatingActionButton />
     </div>
   );
 }

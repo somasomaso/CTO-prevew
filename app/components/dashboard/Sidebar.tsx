@@ -1,90 +1,135 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  House,
+  MagnifyingGlass,
+  Sparkle,
+  UsersThree,
+  SignOut,
+  BookOpen,
+} from "@phosphor-icons/react";
 
-interface NavItem {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
+export interface SidebarUser {
+  name: string;
+  email?: string;
+  initials?: string;
+  isOnline?: boolean;
 }
 
-export function Sidebar() {
+export interface SidebarNavItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+export interface SidebarProps {
+  user?: SidebarUser;
+  navItems?: SidebarNavItem[];
+  onSignOut?: () => void;
+}
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const [a, b] = parts;
+  return `${a?.[0] ?? ""}${b?.[0] ?? ""}`.toUpperCase();
+}
+
+export function Sidebar({ user, navItems, onSignOut }: SidebarProps) {
   const pathname = usePathname();
 
-  const navItems: NavItem[] = [
-    {
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
-      label: "Search",
-      href: "/search",
-    },
-    {
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-      label: "Profile",
-      href: "/profile",
-    },
-  ];
+  const safeUser: SidebarUser = {
+    name: user?.name ?? "Alex Johnson",
+    email: user?.email ?? "alex@lumina.learning",
+    initials: user?.initials ?? getInitials(user?.name ?? "Alex Johnson"),
+    isOnline: user?.isOnline ?? true,
+  };
+
+  const items: SidebarNavItem[] =
+    navItems ??
+    [
+      { label: "Dashboard", href: "/dashboard", icon: <House /> },
+      { label: "Search", href: "/search", icon: <MagnifyingGlass /> },
+      { label: "AI Tools", href: "/ai", icon: <Sparkle weight="fill" /> },
+      { label: "Community", href: "/community", icon: <UsersThree /> },
+    ];
 
   return (
-    <aside className="hidden md:flex w-20 flex-col items-center py-6 border-r border-white/10 bg-black/20 backdrop-blur-xl">
-      <div className="mb-8">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-neon-purple to-neon-blue shadow-neon-purple">
-          <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+    <aside className="glass-strong fixed inset-y-0 left-0 z-40 flex h-screen w-20 border-r border-white/10 md:w-64">
+      <div className="flex w-20 flex-col px-3 py-6 md:w-64 md:px-4">
+        <div className="mb-6 flex items-center justify-center md:justify-start">
+          <Link
+            href="/dashboard"
+            className="group flex items-center gap-3 rounded-2xl px-2 py-1.5 transition-colors hover:bg-white/5"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-neon-purple to-neon-blue shadow-neon-purple">
+              <BookOpen className="h-6 w-6 text-white" weight="fill" />
+            </div>
+            <div className="hidden md:block">
+              <div className="text-sm font-semibold tracking-tight text-white">
+                Lumina
+              </div>
+              <div className="text-xs text-white/60">Learning</div>
+            </div>
+          </Link>
         </div>
-      </div>
 
-      <nav className="flex flex-1 flex-col items-center gap-4">
-        {navItems.map((item, index) => {
-          const isActive = pathname === item.href;
-          return (
-            <a
-              key={index}
-              href={item.href}
-              className={`flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-br from-neon-purple/20 to-neon-blue/20 text-white shadow-neon-purple"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-white"
-              }`}
-              title={item.label}
-            >
-              {item.icon}
-            </a>
-          );
-        })}
-      </nav>
+        <nav className="flex flex-1 flex-col gap-2">
+          {items.map((item) => {
+            const isActive = pathname === item.href;
 
-      <div className="mt-auto">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-neon-purple to-neon-blue">
-          <span className="text-sm font-semibold text-white">JD</span>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={
+                  "glass glass-active glass-hover group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-neon-purple " +
+                  (isActive
+                    ? "text-white"
+                    : "text-white/70 hover:text-white")
+                }
+              >
+                <span className="flex h-6 w-6 items-center justify-center text-white/80 group-hover:text-white">
+                  {item.icon}
+                </span>
+                <span className="hidden md:block">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="mt-6 border-t border-white/10 pt-4">
+          <div className="flex items-center gap-3 rounded-2xl px-3 py-3">
+            <div className="relative">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-neon-purple/30 to-neon-blue/30 text-sm font-semibold text-white">
+                {safeUser.initials}
+              </div>
+              {safeUser.isOnline && (
+                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#050505] bg-neon-cyan" />
+              )}
+            </div>
+
+            <div className="hidden flex-1 md:block">
+              <div className="text-sm font-semibold text-white">
+                {safeUser.name}
+              </div>
+              <div className="text-xs text-white/60">{safeUser.email}</div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onSignOut}
+            className="glass glass-hover mt-2 flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-white/70 hover:text-white"
+          >
+            <span className="flex h-6 w-6 items-center justify-center">
+              <SignOut />
+            </span>
+            <span className="hidden md:block">Sign out</span>
+          </button>
         </div>
       </div>
     </aside>
