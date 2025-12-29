@@ -17,6 +17,12 @@ export const designTokens = {
       secondary: "hsl(var(--color-secondary) / <alpha-value>)",
       "secondary-foreground": "hsl(var(--color-secondary-foreground) / <alpha-value>)",
     },
+    neon: {
+      purple: "hsl(var(--color-neon-purple) / <alpha-value>)",
+      blue: "hsl(var(--color-neon-blue) / <alpha-value>)",
+      pink: "hsl(var(--color-neon-pink) / <alpha-value>)",
+      cyan: "hsl(var(--color-neon-cyan) / <alpha-value>)",
+    },
     status: {
       success: "hsl(var(--color-success) / <alpha-value>)",
       "success-foreground": "hsl(var(--color-success-foreground) / <alpha-value>)",
@@ -39,11 +45,15 @@ export const designTokens = {
     sm: "var(--radius-sm)",
     md: "var(--radius-md)",
     lg: "var(--radius-lg)",
+    xl: "var(--radius-xl)",
+    "2xl": "var(--radius-2xl)",
   },
   shadow: {
     sm: "var(--shadow-sm)",
     md: "var(--shadow-md)",
     lg: "var(--shadow-lg)",
+    "neon-purple": "var(--shadow-neon-purple)",
+    "neon-blue": "var(--shadow-neon-blue)",
   },
   transition: {
     fast: "var(--transition-fast)",
@@ -94,6 +104,13 @@ const config: Config = {
         secondary: designTokens.colors.brand.secondary,
         "secondary-foreground": designTokens.colors.brand["secondary-foreground"],
 
+        neon: {
+          purple: designTokens.colors.neon.purple,
+          blue: designTokens.colors.neon.blue,
+          pink: designTokens.colors.neon.pink,
+          cyan: designTokens.colors.neon.cyan,
+        },
+
         success: designTokens.colors.status.success,
         "success-foreground": designTokens.colors.status["success-foreground"],
         warning: designTokens.colors.status.warning,
@@ -119,11 +136,15 @@ const config: Config = {
         sm: designTokens.radius.sm,
         md: designTokens.radius.md,
         lg: designTokens.radius.lg,
+        xl: designTokens.radius.xl,
+        "2xl": designTokens.radius["2xl"],
       },
       boxShadow: {
         sm: designTokens.shadow.sm,
         md: designTokens.shadow.md,
         lg: designTokens.shadow.lg,
+        "neon-purple": designTokens.shadow["neon-purple"],
+        "neon-blue": designTokens.shadow["neon-blue"],
       },
       transitionDuration: {
         fast: "150ms",
@@ -142,10 +163,15 @@ const config: Config = {
           from: { transform: "translateY(6px)", opacity: "0" },
           to: { transform: "translateY(0)", opacity: "1" },
         },
+        "pulse-neon": {
+          "0%, 100%": { opacity: "1", boxShadow: "0 0 20px hsla(275, 85%, 65%, 0.4)" },
+          "50%": { opacity: "0.8", boxShadow: "0 0 40px hsla(275, 85%, 65%, 0.6)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 150ms ease-out",
         "slide-up": "slide-up 180ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "pulse-neon": "pulse-neon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
