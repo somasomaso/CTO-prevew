@@ -2,6 +2,7 @@
 
 import React from "react";
 import { IconContext } from "@phosphor-icons/react";
+import { AuthProvider } from "./components/AuthProvider";
 
 export function Providers({
   children,
@@ -16,7 +17,9 @@ export function Providers({
         color: "currentColor",
       }}
     >
-      {children}
+      <AuthProvider>
+        {children}
+      </AuthProvider>
     </IconContext.Provider>
   );
 }

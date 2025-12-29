@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { query } from '../config/database';
-import { generateToken } from '../config/jwt';
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../config/jwt';
 import { hashPassword, comparePassword } from '../utils/password';
 import { AuthRequest } from '../types';
 import { AppError } from '../middleware/errorHandler';
@@ -55,6 +55,15 @@ export const signup = async (req: AuthRequest, res: Response): Promise<void> => 
     permissions: userWithRoles.permissions,
   });
 
+  const refreshToken = generateRefreshToken({ userId: userWithRoles.id });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
   res.status(201).json({
     success: true,
     message: 'User registered successfully',
@@ -99,6 +108,15 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
     permissions: userWithRoles.permissions,
   });
 
+  const refreshToken = generateRefreshToken({ userId: user.id });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
   res.json({
     success: true,
     message: 'Login successful',
@@ -137,14 +155,65 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
   res.json({
     success: true,
     data: {
-      ...user,
-      roles: req.user.roles,
-      permissions: req.user.permissions,
+      user: {
+        ...user,
+        roles: req.user.roles,
+        permissions: req.user.permissions,
+      },
+    },
+  });
+};
+
+export const refreshToken = async (req: AuthRequest, res: Response): Promise<void> => {
+  const cookieHeader = req.headers.cookie;
+  const refreshTokenCookie = cookieHeader
+    ?.split(';')
+    .map((c) => c.trim())
+    .find((c) => c.startsWith('refreshToken='));
+
+  if (!refreshTokenCookie) {
+    throw new AppError('Refresh token not found', 401);
+  }
+
+  const refreshTokenValue = decodeURIComponent(refreshTokenCookie.split('=')[1] || '');
+
+  const decoded = verifyRefreshToken(refreshTokenValue);
+
+  const userWithRoles = await getUserWithRolesAndPermissions(decoded.userId);
+
+  const token = generateToken({
+    userId: userWithRoles.id,
+    email: userWithRoles.email,
+    username: userWithRoles.username,
+    roles: userWithRoles.roles,
+    permissions: userWithRoles.permissions,
+  });
+
+  const newRefreshToken = generateRefreshToken({ userId: userWithRoles.id });
+  res.cookie('refreshToken', newRefreshToken, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  res.json({
+    success: true,
+    data: {
+      token,
     },
   });
 };
 
 export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+  });
+
   res.json({
     success: true,
     message: 'Logout successful',
