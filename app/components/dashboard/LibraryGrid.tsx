@@ -1,216 +1,262 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import {
+  DotsThree,
+  Plus,
+  Code,
+  Database,
+  Palette,
+  Cloud,
+  Robot,
+  Book,
+} from "@phosphor-icons/react";
 import { ProgressBar } from "../ui/ProgressBar";
 
-interface Course {
+export type LibraryFilter = "all" | "in-progress" | "completed";
+
+export interface LibraryCourse {
   id: string;
   title: string;
-  subject: string;
+  category: string;
   progress: number;
-  totalModules: number;
-  completedModules: number;
-  thumbnail: React.ReactNode;
-  subjectColor: "blue" | "green" | "purple" | "yellow" | "indigo" | "rose";
+  totalLessons: number;
+  completedLessons: number;
+  icon: React.ReactNode;
+  accent: "purple" | "blue" | "cyan" | "pink";
 }
 
-export function LibraryGrid() {
-  const [filter, setFilter] = useState<"all" | "in-progress" | "completed">("all");
+export interface LibraryGridProps {
+  courses?: LibraryCourse[];
+  onAddCourse?: () => void;
+}
 
-  const courses: Course[] = [
+export function LibraryGrid({ courses, onAddCourse }: LibraryGridProps) {
+  const [filter, setFilter] = useState<LibraryFilter>("all");
+  const [sort, setSort] = useState<"recent" | "progress">("recent");
+
+  const defaultCourses: LibraryCourse[] = [
     {
       id: "1",
       title: "TypeScript Fundamentals",
-      subject: "Backend Development",
+      category: "Backend",
       progress: 85,
-      totalModules: 10,
-      completedModules: 8,
-      thumbnail: (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500/30 to-cyan-500/30">
-          <span className="text-2xl">TS</span>
-        </div>
-      ),
-      subjectColor: "blue",
+      totalLessons: 10,
+      completedLessons: 8,
+      icon: <Code weight="fill" />,
+      accent: "blue",
     },
     {
       id: "2",
       title: "Database Design",
-      subject: "Data Science",
+      category: "Data",
       progress: 45,
-      totalModules: 8,
-      completedModules: 3,
-      thumbnail: (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-green-500/30 to-emerald-500/30">
-          <span className="text-2xl">DB</span>
-        </div>
-      ),
-      subjectColor: "green",
+      totalLessons: 8,
+      completedLessons: 3,
+      icon: <Database weight="fill" />,
+      accent: "cyan",
     },
     {
       id: "3",
       title: "UI/UX Design Principles",
-      subject: "Design",
+      category: "Design",
       progress: 100,
-      totalModules: 6,
-      completedModules: 6,
-      thumbnail: (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500/30 to-pink-500/30">
-          <span className="text-2xl">UX</span>
-        </div>
-      ),
-      subjectColor: "purple",
+      totalLessons: 6,
+      completedLessons: 6,
+      icon: <Palette weight="fill" />,
+      accent: "pink",
     },
     {
       id: "4",
-      title: "Python for Data Analysis",
-      subject: "Data Science",
-      progress: 20,
-      totalModules: 12,
-      completedModules: 2,
-      thumbnail: (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-yellow-500/30 to-orange-500/30">
-          <span className="text-2xl">PY</span>
-        </div>
-      ),
-      subjectColor: "yellow",
+      title: "Cloud Architecture",
+      category: "DevOps",
+      progress: 60,
+      totalLessons: 9,
+      completedLessons: 5,
+      icon: <Cloud weight="fill" />,
+      accent: "purple",
     },
     {
       id: "5",
-      title: "Cloud Architecture",
-      subject: "DevOps",
-      progress: 60,
-      totalModules: 9,
-      completedModules: 5,
-      thumbnail: (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500/30 to-blue-500/30">
-          <span className="text-2xl">☁️</span>
-        </div>
-      ),
-      subjectColor: "indigo",
-    },
-    {
-      id: "6",
       title: "Machine Learning Basics",
-      subject: "AI & ML",
-      progress: 0,
-      totalModules: 15,
-      completedModules: 0,
-      thumbnail: (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-500/30 to-red-500/30">
-          <span className="text-2xl">🤖</span>
-        </div>
-      ),
-      subjectColor: "rose",
+      category: "AI",
+      progress: 20,
+      totalLessons: 15,
+      completedLessons: 3,
+      icon: <Robot weight="fill" />,
+      accent: "cyan",
     },
   ];
 
-  const subjectColorMap: Record<Course["subjectColor"], string> = {
-    blue: "linear-gradient(to right, hsl(217 91% 60% / 0.2), hsl(180 100% 50% / 0.2))",
-    green: "linear-gradient(to right, hsl(142 76% 36% / 0.2), hsl(150 86% 46% / 0.2))",
-    purple: "linear-gradient(to right, hsl(275 85% 65% / 0.2), hsl(330 81% 60% / 0.2))",
-    yellow: "linear-gradient(to right, hsl(38 92% 50% / 0.2), hsl(24 95% 53% / 0.2))",
-    indigo: "linear-gradient(to right, hsl(238 84% 67% / 0.2), hsl(217 91% 60% / 0.2))",
-    rose: "linear-gradient(to right, hsl(350 89% 60% / 0.2), hsl(0 84% 60% / 0.2))",
+  const allCourses = courses ?? defaultCourses;
+
+  const filteredCourses = useMemo(() => {
+    const base = allCourses.filter((course) => {
+      if (filter === "in-progress") return course.progress > 0 && course.progress < 100;
+      if (filter === "completed") return course.progress === 100;
+      return true;
+    });
+
+    if (sort === "progress") {
+      return [...base].sort((a, b) => b.progress - a.progress);
+    }
+
+    return base;
+  }, [allCourses, filter, sort]);
+
+  const filters: Array<{ id: LibraryFilter; label: string }> = [
+    { id: "all", label: "All" },
+    { id: "in-progress", label: "In progress" },
+    { id: "completed", label: "Completed" },
+  ];
+
+  const accentBadge: Record<LibraryCourse["accent"], string> = {
+    purple:
+      "bg-neon-purple/15 text-neon-purple shadow-[0_0_22px_rgba(168,85,247,0.25)]",
+    blue: "bg-neon-blue/15 text-neon-blue shadow-[0_0_22px_rgba(59,130,246,0.22)]",
+    cyan: "bg-neon-cyan/15 text-neon-cyan shadow-[0_0_22px_rgba(6,182,212,0.18)]",
+    pink: "bg-neon-pink/15 text-neon-pink shadow-[0_0_22px_rgba(236,72,153,0.18)]",
   };
 
-  const filteredCourses = courses.filter((course) => {
-    if (filter === "in-progress") {
-      return course.progress > 0 && course.progress < 100;
-    }
-    if (filter === "completed") {
-      return course.progress === 100;
-    }
-    return true;
-  });
-
-  const filters = [
-    { id: "all" as const, label: "All Courses" },
-    { id: "in-progress" as const, label: "In Progress" },
-    { id: "completed" as const, label: "Completed" },
-  ];
+  const accentProgress: Record<LibraryCourse["accent"], string> = {
+    purple: "from-neon-purple via-neon-blue to-neon-cyan",
+    blue: "from-neon-blue via-neon-cyan to-neon-purple",
+    cyan: "from-neon-cyan via-neon-blue to-neon-purple",
+    pink: "from-neon-pink via-neon-purple to-neon-blue",
+  };
 
   return (
     <section className="animate-slide-up" style={{ animationDelay: "100ms" }}>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-foreground">
-          Your Library
-        </h2>
-        
-        <div className="flex gap-2">
-          {filters.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                filter === f.id
-                  ? "bg-gradient-to-r from-neon-purple/20 to-neon-blue/20 border border-neon-purple/30 text-white shadow-neon-purple"
-                  : "bg-transparent text-muted-foreground hover:bg-white/5 hover:text-white"
-              }`}
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/5 text-white">
+              <Book weight="fill" />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-white">Your Library</h2>
+          </div>
+          <p className="mt-1 text-sm text-white/60">Pick up where you left off.</p>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex gap-2">
+            {filters.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                className={
+                  "glass-hover min-h-12 rounded-2xl px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-neon-purple " +
+                  (filter === f.id
+                    ? "glass-active bg-gradient-to-r from-neon-purple/15 to-neon-blue/15 text-white"
+                    : "glass bg-white/0 text-white/70 hover:text-white")
+                }
+                data-active={filter === f.id}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          <label className="glass flex min-h-12 items-center gap-2 rounded-2xl px-4 text-sm text-white/70">
+            <span className="hidden sm:inline">Sort</span>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as typeof sort)}
+              className="bg-transparent text-sm font-semibold text-white outline-none"
+              aria-label="Sort courses"
             >
-              {f.label}
-            </button>
-          ))}
+              <option value="recent">Recent</option>
+              <option value="progress">Progress</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-4">
+        <button
+          type="button"
+          onClick={onAddCourse}
+          className="glass glass-hover group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-white/15 bg-white/0 p-6 text-left text-white/70 hover:text-white focus-visible:ring-2 focus-visible:ring-neon-blue"
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-white">
+            <Plus weight="bold" />
+          </span>
+          <div className="text-base font-semibold">Add course</div>
+          <div className="text-sm text-white/50">Import a new learning path</div>
+        </button>
+
         {filteredCourses.map((course) => (
-          <div
+          <article
             key={course.id}
-            className="group relative overflow-hidden rounded-2xl glass border border-white/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-neon-purple hover:border-neon-purple/30"
+            className="glass glass-hover group relative min-h-[220px] overflow-hidden rounded-3xl p-5"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-neon-blue/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            
-            <div className="relative z-10 p-5">
-              <div className="mb-4 flex h-24 w-full overflow-hidden rounded-xl glass-light">
-                {course.thumbnail}
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.14),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(59,130,246,0.12),transparent_60%)]" />
+            </div>
+
+            <div className="relative z-10 flex h-full flex-col">
+              <div className="flex items-start justify-between">
+                <div
+                  className={
+                    "flex h-11 w-11 items-center justify-center rounded-2xl " +
+                    accentBadge[course.accent]
+                  }
+                >
+                  <span className="text-lg">{course.icon}</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="glass-hover flex h-10 w-10 items-center justify-center rounded-2xl text-white/70 hover:text-white"
+                  aria-label="Course options"
+                >
+                  <DotsThree weight="bold" />
+                </button>
               </div>
 
-              <div className="mb-3">
-                <span 
-                  className="mb-1 inline-block rounded-full px-3 py-1 text-xs font-medium text-white/90"
-                  style={{
-                    background: subjectColorMap[course.subjectColor]
-                  }}
-                >
-                  {course.subject}
-                </span>
-                <h3 className="text-lg font-semibold text-foreground group-hover:text-white transition-colors">
+              <div className="mt-4">
+                <h3 className="line-clamp-1 text-base font-semibold text-white">
                   {course.title}
                 </h3>
+                <p className="mt-1 text-sm text-white/60">{course.category}</p>
               </div>
 
-              <div className="mb-4">
-                <div className="mb-2 flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">
-                    {course.completedModules}/{course.totalModules} modules
+              <div className="mt-4">
+                <div className="mb-2 flex items-center justify-between text-xs text-white/60">
+                  <span>
+                    {course.completedLessons}/{course.totalLessons} lessons
                   </span>
-                  <span className={`font-semibold ${course.progress === 100 ? "text-neon-cyan" : "text-white"}`}>
-                    {course.progress}%
-                  </span>
+                  <span className="font-semibold text-white">{course.progress}%</span>
                 </div>
-                <ProgressBar 
-                  value={course.progress} 
-                  showLabel={false}
-                  className="h-2"
+                <ProgressBar
+                  value={course.progress}
+                  trackClassName="h-2 bg-white/10"
+                  barClassName={`bg-gradient-to-r ${accentProgress[course.accent]} shadow-neon-purple`}
                 />
               </div>
 
-              <button className="w-full rounded-xl bg-gradient-to-r from-white/5 to-white/10 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:from-white/10 hover:to-white/15 border border-white/10 hover:border-white/20">
-                {course.progress === 0 ? "Start Course" : course.progress === 100 ? "Review Course" : "Continue"}
+              <button
+                type="button"
+                className="glass-hover mt-auto inline-flex min-h-12 items-center justify-center rounded-2xl bg-white/5 px-4 text-sm font-semibold text-white hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-neon-purple"
+              >
+                {course.progress === 0
+                  ? "Start"
+                  : course.progress === 100
+                    ? "Review"
+                    : "Continue"}
               </button>
             </div>
 
             {course.progress === 100 && (
-              <div className="absolute right-3 top-3">
+              <div className="absolute right-4 top-4">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-neon-cyan to-neon-blue shadow-neon-blue">
-                  <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <span className="text-xs font-bold text-white">✓</span>
                 </div>
               </div>
             )}
-          </div>
+          </article>
         ))}
       </div>
     </section>

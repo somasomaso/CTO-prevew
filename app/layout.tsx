@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Footer, Navbar } from "./components/layout";
+import React from "react";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: {
-    default: "EduPlatform",
-    template: "%s · EduPlatform",
+    default: "Lumina Learning",
+    template: "%s · Lumina Learning",
   },
   description:
-    "Interactive educational modules with a minimalist, accessible design system.",
+    "Lumina Learning dashboard UI with a glassmorphism design system, neon accents, and micro-interactions.",
 };
 
 export default function RootLayout({
@@ -17,13 +18,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full dark" suppressHydrationWarning>
       <body className="h-full antialiased">
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

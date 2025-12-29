@@ -4,12 +4,16 @@ export interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number;
   max?: number;
   showLabel?: boolean;
+  trackClassName?: string;
+  barClassName?: string;
 }
 
 export function ProgressBar({
   value,
   max = 100,
   showLabel = false,
+  trackClassName,
+  barClassName,
   className = "",
   ...props
 }: ProgressBarProps) {
@@ -24,14 +28,14 @@ export function ProgressBar({
         </div>
       )}
       <div
-        className="h-2 w-full overflow-hidden rounded-full bg-muted"
+        className={`h-2 w-full overflow-hidden rounded-full ${trackClassName ?? "bg-muted"}`}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}
         aria-valuemax={max}
       >
         <div
-          className="h-full rounded-full bg-primary transition-all duration-300"
+          className={`h-full rounded-full transition-all duration-300 ${barClassName ?? "bg-primary"}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
